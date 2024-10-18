@@ -1,31 +1,7 @@
 "use client";
 import React, { useRef, useState } from "react";
-
-type userType = {
-  username: string;
-  id: string;
-} | null;
-
-type listLabelsType = labelType[] | null;
-
-type labelType = {
-  label: string;
-  id: number;
-  private: boolean;
-};
-
-type vnListType = vnType[] | null | [];
-
-type vnType = {
-  id: string;
-  vn: {
-    title: string;
-    alttitle: string;
-    image: {
-      url: string;
-    };
-  };
-};
+import VNDisplay from "./VNDisplay";
+import { labelType, listLabelsType, userType, vnListType, vnType } from "../types";
 
 export const Landing = () => {
   // API-related data
@@ -39,13 +15,13 @@ export const Landing = () => {
 
   // Misc
   const [randomNumber, setRandomNumber] = useState<number>(0);
-  const previousUser = useRef<userType>(null); 
+  const previousUser = useRef<userType>(null);
   const previousSelectedLabel = useRef<string | number>("");
   const hasUserChanged = user !== previousUser.current;
 
   // Loading
   const [loading, setLoading] = useState<boolean>(false);
-  const [error, setError] = useState<string|null>(null); // need fix
+  const [error, setError] = useState<string | null>(null); // need fix
 
   // API-related data
   const fetchUserAndLabels = async () => {
@@ -160,21 +136,15 @@ export const Landing = () => {
       fetchList();
       previousUser.current = user;
       previousSelectedLabel.current = selectedLabel;
-    }
-    else if (list !== null) {
+    } else if (list !== null) {
       setRandomNumber(Math.floor(Math.random() * list.length));
     }
-  }
+  };
 
   return (
-    <div className="w-1/2 mx-auto text-center content-center bg-red-200 p-3 rounded-md">
+    <div className="w-2/3 mx-auto text-center content-center bg-red-200 p-3 rounded-md my-2">
       {/* Username */}
-      <label
-        htmlFor="first_name"
-        className="block text-sm font-medium text-gray-900 dark:text-white text-left"
-      >
-        VNDB Username:
-      </label>
+      <label className="block text-sm font-medium text-gray-900 dark:text-white text-left">VNDB Username:</label>
       <div className="flex w-full gap-4">
         <div className="w-3/4">
           <input
@@ -186,15 +156,15 @@ export const Landing = () => {
             bg-gray-50
             border border-gray-300
             text-gray-900
-        text-sm
-        rounded-lg
-        focus:ring-1 focus:ring-blue-500
-        focus:border-1 focus:border-blue-500
-        focus:outline-none
-        block
-        p-2.5
-        w-full
-        "
+            text-sm
+            rounded-lg
+            focus:ring-1 focus:ring-blue-500
+            focus:border-1 focus:border-blue-500
+            focus:outline-none
+            block
+            p-2.5
+            w-full
+            "
             placeholder="Towa"
           />
         </div>
@@ -203,14 +173,14 @@ export const Landing = () => {
         bg-gray-50
         border border-gray-300
         text-gray-900
-    text-sm
-    rounded-lg
-    focus:ring-1 focus:ring-blue-500
-    focus:border-1 focus:border-blue-500
-    focus:outline-none
-    block
-    p-2.5
-    w-1/4"
+        text-sm
+        rounded-lg
+        focus:ring-1 focus:ring-blue-500
+        focus:border-1 focus:border-blue-500
+        focus:outline-none
+        block
+        p-2.5
+        w-1/4"
           onClick={() => fetchUserAndLabels()}
         >
           Get user
@@ -229,19 +199,18 @@ export const Landing = () => {
           value={selectedLabel}
           onChange={handleLabelChange}
           className="
-        bg-gray-50
-        border border-gray-300
-        text-gray-900
-    text-sm
-    rounded-lg
-    focus:ring-1 focus:ring-blue-500
-    focus:border-1 focus:border-blue-500
-    focus:outline-none
-    block
-    p-2.5
-    w-full
-    "
-        >
+          bg-gray-50
+          border border-gray-300
+          text-gray-900
+          text-sm
+          rounded-lg
+          focus:ring-1 focus:ring-blue-500
+          focus:border-1 focus:border-blue-500
+          focus:outline-none
+          block
+          p-2.5
+          w-full"
+          >
           <option
             value=""
             disabled
@@ -281,30 +250,17 @@ export const Landing = () => {
       >
         {user ? "Let's goooooo" : "Select user & label"}
       </button>
-      {/* </div> */}
-
-      {/* {loading && <div>Loading...</div>} */}
-      {/* {error && <div>Error: {error.message}</div>} */}
-      {/* {user && <div>Data: {JSON.stringify(listLabels)}</div>} */}
-
+    
       {/*  */}
 
       {hasUserChanged && <p>{`Hi, ${user?.username}!`}</p>}
-
-      {!hasUserChanged && list && list.length !== 0 && (
-        <div className="flex flex-col items-center">
-          <p className="mb-1 text-sm">You should read: </p>
-          <h1 className="text-2xl font-bold">{list[randomNumber].vn.title}</h1>
-          {/* {list[randomNumber].vn.alttitle && <p>{list[randomNumber].vn.alttitle}</p>} */}
-          <img
-            className="max-w-lg max-h-96"
-            src={list[randomNumber].vn.image.url}
-            alt={list[randomNumber].vn.title}
-          />
-          <p className="mt-3 text-sm">I hear it's pretty cool.</p>
+      {!hasUserChanged && list && list.length !== 0 && <VNDisplay vn={list[randomNumber]}/>}
+      {!hasUserChanged && list && list.length === 0 && !loading && (
+        <div>
+          <p>There doesn't seem to be anything here?</p>
+          <p>{`Go add stuff to your ${listLabels !== null ? listLabels[(previousSelectedLabel.current as number) - 1].label : ""} list!`}</p>
         </div>
       )}
-      {!hasUserChanged && list && list.length === 0 && !loading && <div><p>There doesn't seem to be anything here?</p><p>{`Go add stuff to your ${listLabels !== null ? listLabels[(previousSelectedLabel.current as number)-1].label : ""} list!`}</p></div>}
       {error}
     </div>
   );
