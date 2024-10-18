@@ -1,68 +1,109 @@
 "use client";
-import React, { useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
+
+type userType = {
+  username: string;
+  id: string;
+} | null;
+
+type listLabelsType = labelType[] | null;
+
+type labelType = {
+  label: string;
+  id: number;
+  private: boolean;
+};
+
+type vnListType = vnType[] | null | [];
+
+type vnType = {
+  id: string;
+  vn: {
+    title: string;
+    alttitle: string;
+    image: {
+      url: string;
+    };
+  };
+};
 
 export const Landing = () => {
-  const [user, setUser] = useState<any>(null);
-  const [loading, setLoading] = useState(false);
-  const [error, setError] = useState<any>(null);
+  // API-related data
+  const [user, setUser] = useState<userType>(null);
+  const [listLabels, setListLabels] = useState<listLabelsType>(null);
+  const [list, setList] = useState<vnListType>(null);
 
-  const [usernameInput, setUsernameInput] = useState("");
+  // Text inputs and dropdowns
+  const [usernameInput, setUsernameInput] = useState<string>("");
+  const [selectedLabel, setSelectedLabel] = useState<string | number>("");
 
+  // Misc
   const [randomNumber, setRandomNumber] = useState<number>(0);
+  const previousUser = useRef<userType>(null); 
+  const previousSelectedLabel = useRef<string | number>("");
+  const hasUserChanged = user !== previousUser.current;
 
-  const handleUsernameChange = (event: React.ChangeEvent<HTMLInputElement>) => {
-    setUsernameInput(event.target.value);
-    // test
-  };
+  // Loading
+  const [loading, setLoading] = useState<boolean>(false);
+  const [error, setError] = useState<any>(null); // need fix
 
-  const fetchUser = async (username: string) => {
+  // API-related data
+  const fetchUserAndLabels = async () => {
     setLoading(true);
     setError(null);
+    let currentUser: userType = null;
+
     try {
-      const response = await fetch("https://api.vndb.org/kana/user?q=" + username);
+      const response = await fetch("https://api.vndb.org/kana/user?q=" + usernameInput);
+      if (!response.ok) {
+        console.log("Network response not ok thing message");
+        throw new Error("Network response was not ok");
+      }
+      const result = await response.json();
+      currentUser = Object.values(result)[0] as userType;
+      setUser(currentUser);
+    } catch (err) {
+      setError(err);
+    }
+
+    if (currentUser === null) {
+      setError(`User ${usernameInput} not found.`);
+      console.log("Some sort of error, idk. User not found.");
+      return;
+    }
+
+    let listLabelsCurrent: listLabelsType = null;
+    try {
+      const response = await fetch("https://api.vndb.org/kana/ulist_labels?user=" + currentUser.id);
       if (!response.ok) {
         throw new Error("Network response was not ok");
       }
       const result = await response.json();
-      //   setUser(result);
-      setUser(Object.values(result)[0]);
+      listLabelsCurrent = Object.values(result)[0] as listLabelsType;
+      setListLabels(listLabelsCurrent);
     } catch (err) {
       setError(err);
-    } finally {
-      setLoading(false);
     }
-  };
 
-  const [listLabels, setListLabels] = useState<any>(null);
-
-  const fetchListLabels = async () => {
-    setLoading(true);
-    setError(null);
-    try {
-      const response = await fetch("https://api.vndb.org/kana/ulist_labels?user=" + user.id);
-      if (!response.ok) {
-        throw new Error("Network response was not ok");
-      }
-      const result = await response.json();
-      //   setUser(result);
-      setListLabels(Object.values(result)[0]);
-    } catch (err) {
-      setError(err);
-    } finally {
-      setLoading(false);
+    if (listLabelsCurrent === null) {
+      setError(`Error, idk how we got here though...`);
+      console.log("Error, listLabels is null.");
+      return;
     }
+
+    const containsWishlist = listLabelsCurrent.find((option: any) => option.label === "Wishlist");
+    if (containsWishlist) setSelectedLabel(containsWishlist.id);
+    setLoading(false);
   };
-
-  const [list, setList] = useState<any>(null);
-  const [selectedLabel, setSelectedLabel] = useState("");
-
-  const fetchList = async (selectedLabel: String) => {
+  const fetchList = async () => {
     setLoading(true);
-    setError(null);
+    // setError(null);
 
-    let allResults: any[] = [];
-    let hasMoreData = true; // Flag to control the loop
+    let allResults: vnType[] = [];
+    let hasMoreData = true;
     let currentPage = 1;
+
+    if (!user) return;
 
     try {
       do {
@@ -85,7 +126,6 @@ export const Landing = () => {
         }
 
         const result = await response.json();
-        //   setList(result.results);
         allResults = [...allResults, ...result.results];
 
         hasMoreData = result.more === true ? true : false;
@@ -99,72 +139,32 @@ export const Landing = () => {
       setLoading(false);
     }
 
-    setRandomNumber(Math.floor(Math.random() * allResults.length) + 1);
+    setRandomNumber(Math.floor(Math.random() * allResults.length));
   };
 
+  // Text inputs and dropdowns
+  const handleUsernameChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+    setUsernameInput(event.target.value);
+  };
   const handleLabelChange = (event: React.ChangeEvent<HTMLSelectElement>) => {
     setSelectedLabel(event.target.value);
   };
-
   const handleKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
     if (e.key === "Enter") {
       fetchUserAndLabels();
     }
   };
-
-  const fetchUserAndLabels = async () => {
-    // await fetchUser(usernameInput); // Fetch user data and update state
-    // await fetchListLabels();        // Fetch labels and update state
-    // console.log(user.id);
-    // console.log(listLabels);
-
-    let currentUser: any = null;
-
-    setLoading(true);
-    setError(null);
-    try {
-      const response = await fetch("https://api.vndb.org/kana/user?q=" + usernameInput);
-      if (!response.ok) {
-        throw new Error("Network response was not ok");
-      }
-      const result = await response.json();
-      //   setUser(result);
-      currentUser = Object.values(result)[0];
-      setUser(Object.values(result)[0]);
-    } catch (err) {
-      setError(err);
-    } finally {
-      setLoading(false);
+  // Misc
+  const setRandomVn = () => {
+    if (list === null || previousUser.current !== user || previousSelectedLabel.current !== selectedLabel) {
+      fetchList();
+      previousUser.current = user;
+      previousSelectedLabel.current = selectedLabel;
     }
-
-    if (currentUser[usernameInput] && currentUser[usernameInput] === null) {
-      console.log("Some sort of error, idk. User not found.");
-      return "Some sort of error, idk. User not found";
+    else if (list !== null) {
+      setRandomNumber(Math.floor(Math.random() * list.length));
     }
-
-    let listLabelsCurrent: any;
-    // setLoading(true);
-    // setError(null);
-    try {
-      const response = await fetch("https://api.vndb.org/kana/ulist_labels?user=" + currentUser.id);
-      if (!response.ok) {
-        throw new Error("Network response was not ok");
-      }
-      const result = await response.json();
-      //   setUser(result);
-      listLabelsCurrent = Object.values(result)[0];
-      setListLabels(Object.values(result)[0]);
-    } catch (err) {
-      setError(err);
-    } finally {
-      setLoading(false);
-    }
-
-    console.log(listLabelsCurrent);
-    const containsWishlist = listLabelsCurrent.find((option: any) => option.label === "Wishlist");
-    console.log(containsWishlist);
-    if (containsWishlist) setSelectedLabel(containsWishlist.id);
-  };
+  }
 
   return (
     <div className="w-1/2 mx-auto text-center content-center bg-red-200 p-3 rounded-md">
@@ -210,30 +210,12 @@ export const Landing = () => {
     focus:outline-none
     block
     p-2.5
-    w-1/4
-    "
-          onClick={() => fetchUser(usernameInput)}
+    w-1/4"
+          onClick={() => fetchUserAndLabels()}
         >
           Get user
         </button>
       </div>
-
-      {/* {user && <p className="italic text-sm">Found you! What label do you wanna search by?</p>} */}
-
-      {/* {loading && <div>Loading...</div>} */}
-      {/* {error && <div>Error: {error.message}</div>} */}
-      {/* {user && <div>Data: {JSON.stringify(user)}</div>} */}
-
-      {/* List labels */}
-      {/* <button onClick={() => fetchListLabels()}>Fetch Labels</button> */}
-
-      {/* {loading && <div>Loading...</div>} */}
-      {/* {error && <div>Error: {error.message}</div>} */}
-      {/* {user && <div>Data: {JSON.stringify(listLabels)}</div>} */}
-
-      {/*  */}
-
-      {/* <button onClick={() => fetchList(selectedLabel)}>Fetch list</button> */}
 
       <div>
         <label
@@ -267,7 +249,7 @@ export const Landing = () => {
             -- Select a label --
           </option>
           {listLabels &&
-            listLabels.map((label: any) => (
+            listLabels.map((label: labelType) => (
               <option
                 key={label.id}
                 value={label.id}
@@ -276,9 +258,6 @@ export const Landing = () => {
               </option>
             ))}
         </select>
-
-        {/* Display the selected label */}
-        {/* {selectedLabel && <p>Selected Label ID: {selectedLabel}</p>} */}
       </div>
 
       <button
@@ -286,30 +265,33 @@ export const Landing = () => {
         bg-gray-50
         border border-gray-300
         text-gray-900
-    text-sm
-    rounded-lg
-    focus:ring-1 focus:ring-blue-500
-    focus:border-1 focus:border-blue-500
-    focus:outline-none
-    block
-    p-2.5
-    w-full
-    my-3
-    "
+        text-sm
+        rounded-lg
+        focus:ring-1 focus:ring-blue-500
+        focus:border-1 focus:border-blue-500
+        focus:outline-none
+        block
+        p-2.5
+        w-full
+        my-3"
         disabled={loading ? true : false}
-        onClick={() => fetchList(selectedLabel)}
+        onClick={() => {
+          setRandomVn();
+        }}
       >
         {user ? "Let's goooooo" : "Select user & label"}
       </button>
       {/* </div> */}
 
       {/* {loading && <div>Loading...</div>} */}
-      {error && <div>Error: {error.message}</div>}
+      {/* {error && <div>Error: {error.message}</div>} */}
       {/* {user && <div>Data: {JSON.stringify(listLabels)}</div>} */}
 
       {/*  */}
 
-      {list && (
+      {hasUserChanged && <p>{`Hi, ${user?.username}!`}</p>}
+
+      {!hasUserChanged && list && list.length !== 0 && (
         <div className="flex flex-col items-center">
           <p className="mb-1 text-sm">You should read: </p>
           <h1 className="text-2xl font-bold">{list[randomNumber].vn.title}</h1>
@@ -321,6 +303,8 @@ export const Landing = () => {
           <p className="mt-3 text-sm">I hear it's pretty cool.</p>
         </div>
       )}
+      {!hasUserChanged && list && list.length === 0 && !loading && <div><p>There doesn't seem to be anything here?</p><p>{`Go add stuff to your ${listLabels !== null ? listLabels[(previousSelectedLabel.current as number)-1].label : ""} list!`}</p></div>}
+      {error}
     </div>
   );
 };
