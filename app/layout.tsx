@@ -14,8 +14,8 @@ const geistMono = localFont({
 });
 
 export const metadata: Metadata = {
-  title: "VNDB Randomizer",
-  description: "For the all indecisive VN readers out there",
+  title: "Random VNDB Grabber",
+  description: "Grab a random VN from your list. Made for the all indecisive VN readers out there!",
 };
 
 export default function RootLayout({

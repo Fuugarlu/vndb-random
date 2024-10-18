@@ -2,6 +2,7 @@
 import React, { useRef, useState } from "react";
 import VNDisplay from "./VNDisplay";
 import { labelType, listLabelsType, userType, vnListType, vnType } from "../types";
+import Button from "./Button";
 
 export const Landing = () => {
   // API-related data
@@ -145,7 +146,7 @@ export const Landing = () => {
     <div className="w-2/3 mx-auto text-center content-center bg-red-200 p-3 rounded-md my-2">
       {/* Username */}
       <label className="block text-sm font-medium text-gray-900 dark:text-white text-left">VNDB Username:</label>
-      <div className="flex w-full gap-4">
+      <div className="flex w-full gap-4 mb-2">
         <div className="w-3/4">
           <input
             type="text"
@@ -165,26 +166,14 @@ export const Landing = () => {
             p-2.5
             w-full
             "
-            placeholder="Towa"
+            placeholder="Fuugarlu"
           />
         </div>
-        <button
-          className="
-        bg-gray-50
-        border border-gray-300
-        text-gray-900
-        text-sm
-        rounded-lg
-        focus:ring-1 focus:ring-blue-500
-        focus:border-1 focus:border-blue-500
-        focus:outline-none
-        block
-        p-2.5
-        w-1/4"
-          onClick={() => fetchUserAndLabels()}
-        >
-          Get user
-        </button>
+
+        <Button
+          onClick={fetchUserAndLabels}
+          label="Get user"
+        />
       </div>
 
       <div>
@@ -210,7 +199,7 @@ export const Landing = () => {
           block
           p-2.5
           w-full"
-          >
+        >
           <option
             value=""
             disabled
@@ -229,32 +218,18 @@ export const Landing = () => {
         </select>
       </div>
 
-      <button
-        className="
-        bg-gray-50
-        border border-gray-300
-        text-gray-900
-        text-sm
-        rounded-lg
-        focus:ring-1 focus:ring-blue-500
-        focus:border-1 focus:border-blue-500
-        focus:outline-none
-        block
-        p-2.5
-        w-full
-        my-3"
-        disabled={loading ? true : false}
-        onClick={() => {
-          setRandomVn();
-        }}
+      <Button
+        onClick={setRandomVn}
+        disabled={loading}
+        fullWidth={true}
+        customClasses="my-3"
       >
         {user ? "Let's goooooo" : "Select user & label"}
-      </button>
-    
+      </Button>
       {/*  */}
 
       {hasUserChanged && <p>{`Hi, ${user?.username}!`}</p>}
-      {!hasUserChanged && list && list.length !== 0 && <VNDisplay vn={list[randomNumber]}/>}
+      {!hasUserChanged && list && list.length !== 0 && <VNDisplay vn={list[randomNumber]} />}
       {!hasUserChanged && list && list.length === 0 && !loading && (
         <div>
           <p>There doesn't seem to be anything here?</p>
