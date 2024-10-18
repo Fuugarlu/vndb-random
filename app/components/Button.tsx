@@ -25,6 +25,10 @@ const Button: React.FC<ButtonProps> = ({ onClick, label, disabled = false, fullW
         focus:outline-none
         block
         p-2.5
+        transition-colors
+        duration-500
+        border
+        border-gray-400
         ${fullWidth ? 'w-full' : 'w-1/4'}
         ${customClasses}
       `}

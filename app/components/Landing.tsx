@@ -143,7 +143,7 @@ export const Landing = () => {
   };
 
   return (
-    <div className="w-2/3 mx-auto text-center content-center bg-red-200 p-3 rounded-md my-2">
+    <div className="w-2/3 mx-auto text-center content-center bg-blue-200 p-3 rounded-md my-2">
       {/* Username */}
       <label className="block text-sm font-medium text-gray-900 dark:text-white text-left">VNDB Username:</label>
       <div className="flex w-full gap-4 mb-2">
@@ -173,6 +173,7 @@ export const Landing = () => {
         <Button
           onClick={fetchUserAndLabels}
           label="Get user"
+          customClasses={`${(!user || user === null) ? "bg-green-200" : ""}`}
         />
       </div>
 
@@ -222,13 +223,15 @@ export const Landing = () => {
         onClick={setRandomVn}
         disabled={loading}
         fullWidth={true}
-        customClasses="my-3"
+        // customClasses="my-3"
+        customClasses={`my-3 ${(user!== null && selectedLabel) ? "bg-green-200" : ""}`}
+
       >
-        {user ? "Let's goooooo" : "Select user & label"}
+        {user ? "Generate!" : "Select user & label"}
       </Button>
       {/*  */}
 
-      {hasUserChanged && <p>{`Hi, ${user?.username}!`}</p>}
+      {user!==null && hasUserChanged && <p>{`Hi, ${user?.username}!`}</p>}
       {!hasUserChanged && list && list.length !== 0 && <VNDisplay vn={list[randomNumber]} />}
       {!hasUserChanged && list && list.length === 0 && !loading && (
         <div>
