@@ -1,5 +1,5 @@
 "use client";
-import React, { useEffect, useRef, useState } from "react";
+import React, { useRef, useState } from "react";
 
 type userType = {
   username: string;
@@ -45,7 +45,7 @@ export const Landing = () => {
 
   // Loading
   const [loading, setLoading] = useState<boolean>(false);
-  const [error, setError] = useState<any>(null); // need fix
+  const [error, setError] = useState<string|null>(null); // need fix
 
   // API-related data
   const fetchUserAndLabels = async () => {
@@ -63,7 +63,7 @@ export const Landing = () => {
       currentUser = Object.values(result)[0] as userType;
       setUser(currentUser);
     } catch (err) {
-      setError(err);
+      setError(err as string);
     }
 
     if (currentUser === null) {
@@ -82,7 +82,7 @@ export const Landing = () => {
       listLabelsCurrent = Object.values(result)[0] as listLabelsType;
       setListLabels(listLabelsCurrent);
     } catch (err) {
-      setError(err);
+      setError(err as string);
     }
 
     if (listLabelsCurrent === null) {
@@ -91,7 +91,7 @@ export const Landing = () => {
       return;
     }
 
-    const containsWishlist = listLabelsCurrent.find((option: any) => option.label === "Wishlist");
+    const containsWishlist = listLabelsCurrent.find((option: labelType) => option.label === "Wishlist");
     if (containsWishlist) setSelectedLabel(containsWishlist.id);
     setLoading(false);
   };
@@ -299,6 +299,7 @@ export const Landing = () => {
           <img
             className="max-w-lg max-h-96"
             src={list[randomNumber].vn.image.url}
+            alt={list[randomNumber].vn.title}
           />
           <p className="mt-3 text-sm">I hear it's pretty cool.</p>
         </div>
