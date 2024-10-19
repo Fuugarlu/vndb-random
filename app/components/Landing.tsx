@@ -12,6 +12,7 @@ export const Landing = () => {
 
   // Text inputs and dropdowns
   const [usernameInput, setUsernameInput] = useState<string>("");
+  // const [usernameInput, setUsernameInput] = useState<string|null>(null);
   const [selectedLabel, setSelectedLabel] = useState<string | number>("");
 
   // Misc
@@ -153,6 +154,7 @@ export const Landing = () => {
           <input
             type="text"
             value={usernameInput}
+            // value={usernameInput ? usernameInput : ""}
             onChange={handleUsernameChange}
             onKeyDown={handleKeyDown}
             className="
@@ -175,6 +177,7 @@ export const Landing = () => {
         <Button
           onClick={fetchUserAndLabels}
           label="Get user"
+          disabled={loading}
           customClasses={`${!user || user === null ? "bg-green-200" : ""}`}
         />
       </div>
@@ -240,7 +243,8 @@ export const Landing = () => {
           <p>{`Go add stuff to your ${listLabels !== null ? listLabels[(previousSelectedLabel.current as number) - 1].label : ""} list!`}</p>
         </div>
       )}
-      {error}
+      {loading && <p>Loading..</p>}
+      {/* {error} */}
     </div>
   );
 };
