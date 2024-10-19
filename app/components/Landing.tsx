@@ -33,7 +33,7 @@ export const Landing = () => {
     try {
       const response = await fetch("https://api.vndb.org/kana/user?q=" + usernameInput);
       if (!response.ok) {
-        console.log("Network response not ok thing message");
+        console.log("Network response not ok");
         throw new Error("Network response was not ok");
       }
       const result = await response.json();
@@ -53,6 +53,7 @@ export const Landing = () => {
     try {
       const response = await fetch("https://api.vndb.org/kana/ulist_labels?user=" + currentUser.id);
       if (!response.ok) {
+        console.log("Network response not ok");
         throw new Error("Network response was not ok");
       }
       const result = await response.json();
@@ -99,6 +100,7 @@ export const Landing = () => {
         });
 
         if (!response.ok) {
+          console.log("Network response not ok");
           throw new Error("Network response was not ok");
         }
 
@@ -173,7 +175,7 @@ export const Landing = () => {
         <Button
           onClick={fetchUserAndLabels}
           label="Get user"
-          customClasses={`${(!user || user === null) ? "bg-green-200" : ""}`}
+          customClasses={`${!user || user === null ? "bg-green-200" : ""}`}
         />
       </div>
 
@@ -224,14 +226,13 @@ export const Landing = () => {
         disabled={loading}
         fullWidth={true}
         // customClasses="my-3"
-        customClasses={`my-3 ${(user!== null && selectedLabel) ? "bg-green-200" : ""}`}
-
+        customClasses={`my-3 ${user !== null && selectedLabel ? "bg-green-200" : ""}`}
       >
         {user ? "Generate!" : "Select user & label"}
       </Button>
       {/*  */}
 
-      {user!==null && hasUserChanged && <p>{`Hi, ${user?.username}!`}</p>}
+      {user !== null && hasUserChanged && <p>{`Hi, ${user?.username}!`}</p>}
       {!hasUserChanged && list && list.length !== 0 && <VNDisplay vn={list[randomNumber]} />}
       {!hasUserChanged && list && list.length === 0 && !loading && (
         <div>
