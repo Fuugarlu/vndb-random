@@ -244,7 +244,7 @@ export const Landing = () => {
         </div>
       )}
       {loading && <p>Loading..</p>}
-      {/* {error} */}
+      {error}
     </div>
   );
 };
