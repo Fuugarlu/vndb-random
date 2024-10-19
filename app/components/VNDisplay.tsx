@@ -1,7 +1,7 @@
 // components/VNDisplay.tsx
 import React from "react";
 import { vnType } from "../types";
-import Image from "next/image";
+// import Image from "next/image";
 
 interface VNDisplayProps {
   vn: vnType;
@@ -16,7 +16,8 @@ const VNDisplay: React.FC<VNDisplayProps> = ({ vn }) => {
       </a>
       <a href={`https://vndb.org/${vn.id}`}>
         {/* {vn.vn.alttitle && <p>{vn.vn.alttitle}</p>} */}
-        <Image
+        {/* <Image */}
+        <img
           className="max-w-lg max-h-96"
           src={vn.vn.image.url}
           alt={vn.vn.title}
