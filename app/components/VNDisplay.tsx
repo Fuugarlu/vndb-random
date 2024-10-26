@@ -11,12 +11,13 @@ const VNDisplay: React.FC<VNDisplayProps> = ({ vn }) => {
   return (
     <div className="flex flex-col items-center">
       <p className="mb-1 text-sm">You should read: </p>
-      <a href={`https://vndb.org/${vn.id}`}>
-        <h1 className="text-2xl font-bold mb-1">{vn.vn.title}</h1>
+      <a href={`https://vndb.org/${vn.id}`} className="mb-1">
+        <h1 className="text-2xl font-bold">{vn.vn.title}</h1>
+        {/* {vn.vn.alttitle && <p>{vn.vn.alttitle}</p>} */}
       </a>
       <a href={`https://vndb.org/${vn.id}`}>
-        {/* {vn.vn.alttitle && <p>{vn.vn.alttitle}</p>} */}
-        <Image
+        {/* <Image */}
+        <img
           className="max-w-lg max-h-96"
           src={vn.vn.image.url}
           alt={vn.vn.title}
