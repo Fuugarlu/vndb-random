@@ -5,9 +5,10 @@ import Image from "next/image";
 
 interface VNDisplayProps {
   vn: vnType;
+  sameRandomNumberCount: number;
 }
 
-const VNDisplay: React.FC<VNDisplayProps> = ({ vn }) => {
+const VNDisplay: React.FC<VNDisplayProps> = ({ vn, sameRandomNumberCount }) => {
   return (
     <div className="flex flex-col items-center">
       <p className="mb-1 text-sm">You should read: </p>
@@ -16,13 +17,14 @@ const VNDisplay: React.FC<VNDisplayProps> = ({ vn }) => {
         {/* {vn.vn.alttitle && <p>{vn.vn.alttitle}</p>} */}
       </a>
       <a href={`https://vndb.org/${vn.id}`}>
-        {/* <Image */}
         <img
           className="max-w-lg max-h-96"
           src={vn.vn.image.url}
           alt={vn.vn.title}
         />
       </a>
+      
+      {sameRandomNumberCount > 0 && <p className="mt-3 text-sm">This VN showed up {sameRandomNumberCount > 0 && sameRandomNumberCount + 1} times in a row!</p>}
       <p className="mt-3 text-sm">I hear it's pretty cool.</p>
       <p className="text-xs">(Click the cover for the vndb page)</p>
     </div>

@@ -7,13 +7,14 @@ interface VNAreaProps {
     selectedLabel: number;
     listLabels: listLabelsType;
     randomNumber?: number;
+    sameRandomNumberCount: number;
   }
 
-const VNArea:React.FC<VNAreaProps> = ({list, selectedLabel, listLabels, randomNumber=-1}) => {
+const VNArea:React.FC<VNAreaProps> = ({list, selectedLabel, listLabels, randomNumber=-1, sameRandomNumberCount}) => {
   return (
     <div>
         {randomNumber == -1 && <p>Error!</p>}
-        {list && list.length !== 0 && <VNDisplay vn={list[randomNumber]} />}
+        {list && list.length !== 0 && <VNDisplay vn={list[randomNumber]} sameRandomNumberCount={sameRandomNumberCount}/>}
         {list && list.length === 0 && (
         <div>
           <p>There doesn't seem to be anything here?</p>
