@@ -1,9 +1,8 @@
-// components/Button.tsx
+// components/SubmitButton.tsx
 
 import React from 'react';
 
-type ButtonProps = {
-  onClick: () => void;
+type SubmitButton = {
   label?: string;
   disabled?: boolean;
   fullWidth?: boolean;
@@ -11,9 +10,10 @@ type ButtonProps = {
   children?: React.ReactNode;
 };
 
-const Button: React.FC<ButtonProps> = ({ onClick, label, disabled = false, fullWidth = false, customClasses = '', children }) => {
+const SubmitButton: React.FC<SubmitButton> = ({ label, disabled = false, fullWidth = false, customClasses = '' }) => {
   return (
     <button
+    type="submit"
       className={`
         bg-gray-50
         border border-gray-300
@@ -29,15 +29,16 @@ const Button: React.FC<ButtonProps> = ({ onClick, label, disabled = false, fullW
         duration-500
         border
         border-gray-400
-        ${fullWidth ? 'w-full' : 'w-1/4'}
+        ${fullWidth ? 'w-full' : 'w-1/3'}
+        h-11
         ${customClasses}
       `}
-      onClick={onClick}
+      // onClick={onClick}
       disabled={disabled}
     >
-      {label || children}
+      {label}
     </button>
   );
 };
 
-export default Button;
+export default SubmitButton;
