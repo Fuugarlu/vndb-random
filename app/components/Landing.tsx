@@ -1,7 +1,6 @@
 "use client";
 import React, { useEffect, useRef, useState } from "react";
 import { labelType, listLabelsType, userType, vnListType, vnType } from "../types";
-import Checkbox from "./Checkbox";
 import UsernameInput from "./UsernameInput";
 import LabelDropdown from "./LabelDropdown";
 import { useForm } from "react-hook-form";
@@ -15,11 +14,7 @@ export const Landing = () => {
     formState: { errors },
     watch,
     setValue,
-  } = useForm<any>({
-    defaultValues: {
-      // select: { value: "vanilla", label: "Vanilla" },
-    },
-  });
+  } = useForm<any>();
 
   // API-related data
   const [user, setUser] = useState<userType>(null);
@@ -29,6 +24,7 @@ export const Landing = () => {
   // Forms
   const [formData, setFormData] = useState<any>("");
   const [oldUser, setOldUser] = useState<userType>(null);
+  const [filters, setFilters] = useState<any[]>([]); // Initialize filters state
 
   // Misc
   const [randomNumber, setRandomNumber] = useState<number>(0);
@@ -124,7 +120,7 @@ export const Landing = () => {
             fields: "id, vn.title, vn.image.url, vn.alttitle",
             results: 100,
             page: currentPage,
-            filters: ["label", "=", label],
+            filters: label,
           }),
         });
 
@@ -155,13 +151,52 @@ export const Landing = () => {
     const today = new Date();
     return today.toISOString().split("T")[0];
   };
+  const generateFilters = (data: any) => {
+    const baseFilter = ["label", "=", data.label];
+    const finalFilters = [baseFilter];
+    if (data.releasedOnly && data.englishOnly) {
+      finalFilters.push([
+        "release",
+        "=",
+        [
+          "and",
+          ["released", "<=", getTodayDate()], // Example condition for released
+          ["lang", "=", "en"],
+        ],
+      ]);
+    } else if (data.releasedOnly) {
+      finalFilters.push([
+        "release",
+        "=",
+        [
+          "released",
+          "<=",
+          getTodayDate(), // Example condition for released
+        ],
+      ]);
+    } else if (data.englishOnly) {
+      finalFilters.push([
+        "release",
+        "=",
+        [
+          "lang",
+          "=",
+          "en", // Example condition for released
+        ],
+      ]);
+    }
+    return finalFilters;
+  };
 
-  // console.log(errors.username?.message);
-
-  console.log(formData);
 
   return (
     <div className="w-2/3 mx-auto text-center content-center bg-blue-200 p-3 rounded-md my-2 flex flex-col gap-2">
+      {/* <p>Random VNDB Grabber by <a href="/info" className="text-blue-600 underline hover:text-blue-800">Fuugarlu</a></p> */}
+      <div>
+      <p>Random VNDB Grabber by Fuugarlu</p>
+      <p className="text-sm italic">(Grab a random vn from your vndb list)</p>
+      </div>
+
       <form
         onSubmit={handleSubmit((data) => {
           fetchUserAndLabels(data.username);
@@ -186,16 +221,17 @@ export const Landing = () => {
       <form
         onSubmit={handleSubmit((data) => {
           if (data.label == "") return;
-          if (data.label != formData.label || user != oldUser) {
+          if (data.label != formData.label || data.releasedOnly != formData.releasedOnly || data.englishOnly != formData.englishOnly || user != oldUser) {
             console.log("Fetching");
             setOldUser(user);
             setSameRandomNumberCount(0);
-            fetchList(data.label);
+            const filters = generateFilters(data);
+            fetchList(["and", ...filters]);
           } else if (list) {
             console.log("Repeat");
             let newRandomNumber = Math.floor(Math.random() * list.length);
             if (newRandomNumber == randomNumber) {
-              setSameRandomNumberCount(sameRandomNumberCount+1);
+              setSameRandomNumberCount(sameRandomNumberCount + 1);
             } else {
               setRandomNumber(newRandomNumber);
               setSameRandomNumberCount(0);
@@ -206,13 +242,33 @@ export const Landing = () => {
           setFormData(data);
         })}
       >
-        <div className="flex flex-col gap-4">
+        <div className="flex flex-col gap-2">
           <LabelDropdown
             readableLabel="Search label:"
             listLabels={listLabels}
             label="label"
             register={register}
           />
+
+          <div className="flex flex-col text-left">
+            <label>
+              <input
+                type="checkbox"
+                {...register("releasedOnly")}
+                className="w-4 h-4 mx-2"
+              />
+              Released VNs only
+            </label>
+
+            <label>
+              <input
+                type="checkbox"
+                {...register("englishOnly")}
+                className="w-4 h-4 mx-2"
+              />
+              English or English-translated VNs only
+            </label>
+          </div>
 
           <SubmitButton
             disabled={!(user && labelValue !== "") || loading}
@@ -257,9 +313,7 @@ export const Landing = () => {
 
       {/* //TODO: add changelog and/or git link */}
       {/* //TODO: button/page^ to mention tidbits (ex. refresh for update...) */}
-      {/* //TODO: maybe: add logged in user indicator besides hi message */}
       {/* //TODO: add info page for contact (email?) in case something breaks. title/message/howtocontactifok */}
-      {/* //TODO: add language/release date features */}
     </div>
   );
 };

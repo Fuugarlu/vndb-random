@@ -19,7 +19,7 @@ const LabelDropdown: React.FC<LabelDropdownProps> = ({
     <div>
       <label
         htmlFor="labelDropdown"
-        className="block text-sm font-medium text-gray-900 dark:text-white text-left"
+        className="block text-sm font-medium text-gray-900 text-left"
       >
         {readableLabel}
       </label>

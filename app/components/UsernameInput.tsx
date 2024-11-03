@@ -16,7 +16,7 @@ class UsernameInput extends Component<UsernameInputProps> {
 
     return (
       <div className='w-full'>
-        <label className="block text-sm font-medium text-gray-900 dark:text-white text-left">
+        <label className="block text-sm font-medium text-gray-900 text-left">
           {readableLabel}
         </label>
             <input
