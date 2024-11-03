@@ -1,7 +1,5 @@
 // UsernameInput.tsx
 import React, { Component } from 'react';
-import { userType } from '../types';
-import SubmitButton from './Button';
 
 
 interface UsernameInputProps {

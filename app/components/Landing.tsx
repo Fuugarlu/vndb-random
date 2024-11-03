@@ -1,5 +1,5 @@
 "use client";
-import React, { useEffect, useRef, useState } from "react";
+import React, { useEffect, useState } from "react";
 import { labelType, listLabelsType, userType, vnListType, vnType } from "../types";
 import UsernameInput from "./UsernameInput";
 import LabelDropdown from "./LabelDropdown";
@@ -11,7 +11,6 @@ export const Landing = () => {
   const {
     register,
     handleSubmit,
-    formState: { errors },
     watch,
     setValue,
   } = useForm<any>();
@@ -24,7 +23,6 @@ export const Landing = () => {
   // Forms
   const [formData, setFormData] = useState<any>("");
   const [oldUser, setOldUser] = useState<userType>(null);
-  const [filters, setFilters] = useState<any[]>([]); // Initialize filters state
 
   // Misc
   const [randomNumber, setRandomNumber] = useState<number>(0);
@@ -228,7 +226,7 @@ export const Landing = () => {
             fetchList(["and", ...filters]);
           } else if (list) {
             console.log("Repeat");
-            let newRandomNumber = Math.floor(Math.random() * list.length);
+            const newRandomNumber = Math.floor(Math.random() * list.length);
             if (newRandomNumber == randomNumber) {
               setSameRandomNumberCount(sameRandomNumberCount + 1);
             } else {
