@@ -6,6 +6,7 @@ import LabelDropdown from "./LabelDropdown";
 import { useForm } from "react-hook-form";
 import SubmitButton from "./Button";
 import VNArea from "./VNArea";
+import Link from "next/link";
 
 export const Landing = () => {
   const {
@@ -190,7 +191,7 @@ export const Landing = () => {
   return (
     <div className="w-2/3 mx-auto text-center content-center bg-blue-200 p-3 rounded-md my-2 flex flex-col gap-2">
       <div>
-      <p>Random VNDB Grabber by <a href="/info" className="text-blue-600 underline hover:text-blue-800">Fuugarlu</a></p>
+      <p>Random VNDB Grabber by <Link href="/info" className="text-blue-600 underline hover:text-blue-800">Fuugarlu</Link></p>
       <p className="text-sm italic">(Grab a random vn from your vndb list)</p>
       </div>
 
