@@ -16,5 +16,10 @@ Note that the main branch is dev. The gh-pages branch is deployed.
 
 ___
 
+**Changelog:**
+- 2024/11/03: Added filters for release/English. Added info page. Added message for VNs generated multiple times in a row.
+
+___
+
 **Known issues:**
 - Currently none. I guess non-descriptive error messages?
