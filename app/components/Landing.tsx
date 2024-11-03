@@ -191,9 +191,8 @@ export const Landing = () => {
 
   return (
     <div className="w-2/3 mx-auto text-center content-center bg-blue-200 p-3 rounded-md my-2 flex flex-col gap-2">
-      {/* <p>Random VNDB Grabber by <a href="/info" className="text-blue-600 underline hover:text-blue-800">Fuugarlu</a></p> */}
       <div>
-      <p>Random VNDB Grabber by Fuugarlu</p>
+      <p>Random VNDB Grabber by <a href="/info" className="text-blue-600 underline hover:text-blue-800">Fuugarlu</a></p>
       <p className="text-sm italic">(Grab a random vn from your vndb list)</p>
       </div>
 
@@ -310,10 +309,6 @@ export const Landing = () => {
           sameRandomNumberCount={sameRandomNumberCount}
         />
       )}
-
-      {/* //TODO: add changelog and/or git link */}
-      {/* //TODO: button/page^ to mention tidbits (ex. refresh for update...) */}
-      {/* //TODO: add info page for contact (email?) in case something breaks. title/message/howtocontactifok */}
     </div>
   );
 };
