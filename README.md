@@ -10,16 +10,20 @@ Feel free to send any issues or suggestions!
 
 ___
 
-Data isn't saved anywhere, so don't worry about privacy or anything.
-
-Note that the main branch is dev. The gh-pages branch is deployed.
-
-___
 
 **Changelog:**
 - 2024/11/03: Added filters for release/English. Added info page. Added message for VNs generated multiple times in a row.
+- 2024/11/12: Added a "Show History" button. It gets cleared when you change any settings.
 
 ___
 
 **Known issues:**
-- Currently none. I guess non-descriptive error messages?
+- Currently none. I guess non-descriptive error messages and some "any" types.
+
+___
+
+Data isn't saved anywhere, so don't worry about privacy or anything.
+
+Note that the main branch is dev. The gh-pages branch is deployed.
+
+Runs locally via "npm run dev" on http://localhost:3000/vndb-random

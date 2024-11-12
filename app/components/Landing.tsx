@@ -7,6 +7,7 @@ import { useForm } from "react-hook-form";
 import SubmitButton from "./Button";
 import VNArea from "./VNArea";
 import Link from "next/link";
+import { VNHistory } from "./VNHistory";
 
 export const Landing = () => {
   const {
@@ -20,6 +21,7 @@ export const Landing = () => {
   const [user, setUser] = useState<userType>(null);
   const [listLabels, setListLabels] = useState<listLabelsType>(null);
   const [list, setList] = useState<vnListType>(null);
+  const [generatedVNs, setGeneratedVNs] = useState<any>([]);
 
   // Forms
   const [formData, setFormData] = useState<any>("");
@@ -29,6 +31,16 @@ export const Landing = () => {
   const [randomNumber, setRandomNumber] = useState<number>(0);
   const labelValue = watch("label");
   const [sameRandomNumberCount, setSameRandomNumberCount] = useState<number>(0);
+
+  
+  useEffect(() => {
+    if (list && Array.isArray(list) && list[randomNumber] !== undefined) {
+      setGeneratedVNs((generatedVNs: any) => [
+        ...generatedVNs,
+        list[randomNumber] as vnType,
+      ]);
+    }
+  }, [list, randomNumber, sameRandomNumberCount])
 
   // Loading
   const [loading, setLoading] = useState<boolean>(false);
@@ -221,6 +233,7 @@ export const Landing = () => {
           if (data.label == "") return;
           if (data.label != formData.label || data.releasedOnly != formData.releasedOnly || data.englishOnly != formData.englishOnly || user != oldUser) {
             console.log("Fetching");
+            setGeneratedVNs([]);
             setOldUser(user);
             setSameRandomNumberCount(0);
             const filters = generateFilters(data);
@@ -277,24 +290,6 @@ export const Landing = () => {
         </div>
       </form>
 
-      {/* <div>
-        <div className="flex items-center justify-center">
-        <Checkbox
-        label="Released VNs only"
-        checked={isReleasedOnlyChecked}
-        onChange={handleCheckboxChange}
-      />
-          <input className="w-4 h-4 mx-2" type="checkbox" id="released-only" name="released-only" value="Bike" />
-          <label htmlFor="released-only">Released VNs only</label><br />
-          <input className="w-4 h-4 mx-2" type="checkbox" id="en-only" name="en-only" value="Bike" />
-          <label htmlFor="en-only">EN only</label><br />
-          <input className="w-4 h-4 mx-2" type="checkbox" id="jp-only" name="jp-only" value="Bike" />
-          <label htmlFor="jp-only">JP only</label><br />
-          <input className="w-4 h-4 mx-2" type="checkbox" id="all list?" name="all list?" value="Bike" />
-          <label htmlFor="all list?">Entire list</label><br />
-        </div>
-      </div> */}
-
       {user !== null && !loading && !list && <p>{`Hi, ${user?.username}!`}</p>}
       {loading && <p>Loading..</p>}
       {error}
@@ -307,6 +302,10 @@ export const Landing = () => {
           randomNumber={randomNumber}
           sameRandomNumberCount={sameRandomNumberCount}
         />
+      )}
+
+      {list && (
+        <VNHistory vns={generatedVNs}/>
       )}
     </div>
   );

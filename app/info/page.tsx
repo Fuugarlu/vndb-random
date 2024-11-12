@@ -10,8 +10,9 @@ export default function InfoPage() {
 
 <div className="flex flex-col gap-1">
       <p>Any issues or suggestions? Let me know!</p>
-      <GitHubLink />
+      <GitHubLink /> 
       <RedditLink />
+      <p className="mt-5">The GitHub link includes a changelog.</p>
       </div>
       
     </div>
