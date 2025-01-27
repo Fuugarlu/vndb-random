@@ -22,7 +22,7 @@ export const VNHistory: React.FC<VNHistoryProps> = ({ vns }) => {
         </p>
       </div>
 
-      {showHistory && <div className="flex flex-col">{vns && vns.map((vn: vnType, counter: number) => <a href={`https://vndb.org/${vn.id}`} key={vn.id}>{`${counter + 1}. ${vn.vn.title}`}</a>)}</div>}
+      {showHistory && <div className="flex flex-col">{vns && vns.map((vn: vnType, counter: number) => <a className="hover:text-blue-600" href={`https://vndb.org/${vn.id}`} key={vn.id}>{`${counter + 1}. ${vn.vn.title}`}</a>)}</div>}
     </div>
   );
 };
