@@ -1,10 +1,10 @@
 import React from 'react';
 import { labelType } from '../types';
-import { UseFormRegister } from 'react-hook-form';
+import { FieldValues, UseFormRegister } from 'react-hook-form';
 
 interface LabelDropdownProps {
   listLabels: labelType[] | null;
-  register: UseFormRegister<any>; // TODO: remove any
+  register: UseFormRegister<FieldValues>;
   label: string;
   readableLabel: string;
 }
