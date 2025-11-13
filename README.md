@@ -20,6 +20,7 @@ ___
 
 **Known issues:**
 - Currently none. I guess non-descriptive error messages and some "any" types.
+- Code could be cleaner haha...
 
 ___
 

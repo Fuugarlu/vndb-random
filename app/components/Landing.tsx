@@ -267,7 +267,7 @@ export const Landing = () => {
             lengthValues != oldLengthValues ||
             user != oldUser
           ) {
-            console.log("Fetching");
+            // console.log("Fetching");
             setGeneratedVNs([]);
             setOldLengthValues(lengthValues);
             setOldUser(user);

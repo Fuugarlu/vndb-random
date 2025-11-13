@@ -26,7 +26,7 @@ export const VNHistory: React.FC<VNHistoryProps> = ({ vns }) => {
         <div className="flex flex-col">
           {vns
           && vns.map((vn: vnType, counter: number) =>
-            <span key={vn.id}>
+            <span key={counter}>
               {`${counter + 1}. `}
               <a href={`https://vndb.org/${vn.id}`} className="cursor-pointer hover:text-blue-800 hover:underline">
                 {`${vn.vn.title}`}
