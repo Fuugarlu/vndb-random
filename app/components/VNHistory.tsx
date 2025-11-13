@@ -15,7 +15,7 @@ export const VNHistory: React.FC<VNHistoryProps> = ({ vns }) => {
         onClick={() => setShowHistory(!showHistory)}
         className="p-1 cursor-pointer text-blue-600 hover:text-blue-800"
       >
-        <p className="flex items-center">
+        <p className="flex items-center select-none">
           <span className="text-xl">{showHistory === false ? <IoMdArrowDropdown /> : <IoMdArrowDropup />}</span>
           {showHistory === false ? "Show" : "Hide"} History
           <span className="text-xl">{showHistory === false ? <IoMdArrowDropdown /> : <IoMdArrowDropup />}</span>{" "}

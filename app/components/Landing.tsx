@@ -1,6 +1,12 @@
 "use client";
 import React, { useEffect, useState } from "react";
-import { labelType, listLabelsType, userType, vnListType, vnType } from "../types";
+import {
+  labelType,
+  listLabelsType,
+  userType,
+  vnListType,
+  vnType,
+} from "../types";
 import UsernameInput from "./UsernameInput";
 import LabelDropdown from "./LabelDropdown";
 import { FieldValues, useForm } from "react-hook-form";
@@ -8,21 +14,19 @@ import SubmitButton from "./Button";
 import VNArea from "./VNArea";
 import Link from "next/link";
 import { VNHistory } from "./VNHistory";
+import ExtraOptions from "./ExtraOptions/ExtraOptions";
+import { LengthOption } from "./ExtraOptions/LengthSelect";
 
 interface FormDataType {
   label: number | string;
   releasedOnly: string;
   englishOnly: string;
   username: string;
+  lengths: readonly LengthOption[];
 }
 
 export const Landing = () => {
-  const {
-    register,
-    handleSubmit,
-    watch,
-    setValue,
-  } = useForm<FieldValues>();
+  const { register, handleSubmit, watch, setValue } = useForm<FieldValues>();
 
   // API-related data
   const [user, setUser] = useState<userType>(null);
@@ -31,20 +35,23 @@ export const Landing = () => {
   const [generatedVNs, setGeneratedVNs] = useState<vnListType>([]);
 
   // Forms
+  const [lengthValues, setLengthValues] = useState<readonly LengthOption[]>([]);
   const [formData, setFormData] = useState<FieldValues>({
     label: -1,
     releasedOnly: "",
     englishOnly: "",
-    username: ""
+    username: "",
+    lengths: lengthValues
   });
 
+  const [oldLengthValues, setOldLengthValues] = useState<readonly LengthOption[]>([]);
   const [oldUser, setOldUser] = useState<userType>(null);
 
   // Misc
   const [randomNumber, setRandomNumber] = useState<number>(0);
   const labelValue = watch("label");
   const [sameRandomNumberCount, setSameRandomNumberCount] = useState<number>(0);
-  
+
   useEffect(() => {
     if (list && Array.isArray(list) && list[randomNumber] !== undefined) {
       setGeneratedVNs((generatedVNs: any) => [
@@ -52,7 +59,7 @@ export const Landing = () => {
         list[randomNumber] as vnType,
       ]);
     }
-  }, [list, randomNumber, sameRandomNumberCount])
+  }, [list, randomNumber, sameRandomNumberCount]);
 
   // Loading
   const [loading, setLoading] = useState<boolean>(false);
@@ -60,7 +67,9 @@ export const Landing = () => {
 
   useEffect(() => {
     if (listLabels && listLabels.length > 0) {
-      const containsWishlist = listLabels.find((option: labelType) => option.label === "Wishlist");
+      const containsWishlist = listLabels.find(
+        (option: labelType) => option.label === "Wishlist"
+      );
       if (containsWishlist) setValue("label", containsWishlist.id);
     }
   }, [listLabels, setValue]);
@@ -76,7 +85,9 @@ export const Landing = () => {
 
     try {
       // TODO: update and remove usernameInput
-      const response = await fetch(`https://api.vndb.org/kana/user?q=${username}`);
+      const response = await fetch(
+        `https://api.vndb.org/kana/user?q=${username}`
+      );
       if (!response.ok) {
         console.log("Network response not ok");
         throw new Error("Network response was not ok");
@@ -99,7 +110,9 @@ export const Landing = () => {
 
     let listLabelsCurrent: listLabelsType = null;
     try {
-      const response = await fetch(`https://api.vndb.org/kana/ulist_labels?user=${currentUser.id}`);
+      const response = await fetch(
+        `https://api.vndb.org/kana/ulist_labels?user=${currentUser.id}`
+      );
       if (!response.ok) {
         console.log("Network response not ok");
         console.log(response);
@@ -158,7 +171,9 @@ export const Landing = () => {
       } while (hasMoreData === true);
       setList(allResults);
     } catch (err) {
-      setError(err instanceof Error ? err.message : "An unknown error occurred");
+      setError(
+        err instanceof Error ? err.message : "An unknown error occurred"
+      );
       console.log(err);
     } finally {
       setLoading(false);
@@ -190,17 +205,35 @@ export const Landing = () => {
       finalFilters.push([
         "release",
         "=",
-        releaseFilters.length > 1 ? ["and", ...releaseFilters] : releaseFilters[0],
+        releaseFilters.length > 1
+          ? ["and", ...releaseFilters]
+          : releaseFilters[0],
       ]);
     }
+
+    if (lengthValues.length > 0) {
+      const lengths = lengthValues.map((item) => item.value);
+      const lengthList = lengths.map((length) => ["length", "=", length]);
+      const lengthFilters = ["or", ...lengthList];
+      finalFilters.push(lengthFilters);
+    }
+
     return finalFilters;
   };
 
   return (
     <div className="w-2/3 mx-auto text-center content-center bg-blue-200 p-3 rounded-md my-2 flex flex-col gap-2">
       <div>
-      <p>Random VNDB Grabber by <Link href="/info" className="text-blue-600 underline hover:text-blue-800">Fuugarlu</Link></p>
-      <p className="text-sm italic">(Grab a random vn from your vndb list)</p>
+        <p>
+          Random VNDB Grabber by{" "}
+          <Link
+            href="/info"
+            className="text-blue-600 underline hover:text-blue-800"
+          >
+            Fuugarlu
+          </Link>
+        </p>
+        <p className="text-sm italic">(Grab a random vn from your vndb list)</p>
       </div>
 
       <form
@@ -227,9 +260,16 @@ export const Landing = () => {
       <form
         onSubmit={handleSubmit((data) => {
           if (data.label == "") return;
-          if (data.label != formData.label || data.releasedOnly != formData.releasedOnly || data.englishOnly != formData.englishOnly || user != oldUser) {
+          if (
+            data.label != formData.label ||
+            data.releasedOnly != formData.releasedOnly ||
+            data.englishOnly != formData.englishOnly ||
+            lengthValues != oldLengthValues ||
+            user != oldUser
+          ) {
             console.log("Fetching");
             setGeneratedVNs([]);
+            setOldLengthValues(lengthValues);
             setOldUser(user);
             setSameRandomNumberCount(0);
             const filters = generateFilters(data);
@@ -276,6 +316,8 @@ export const Landing = () => {
             </label>
           </div>
 
+          <ExtraOptions lengths={lengthValues} setLengths={setLengthValues} />
+
           <SubmitButton
             disabled={!(user && labelValue !== "") || loading}
             fullWidth={true}
@@ -299,9 +341,7 @@ export const Landing = () => {
         />
       )}
 
-      {list && (
-        <VNHistory vns={generatedVNs}/>
-      )}
+      {list && <VNHistory vns={generatedVNs} />}
     </div>
   );
 };
