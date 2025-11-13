@@ -17,13 +17,13 @@ import { VNHistory } from "./VNHistory";
 import ExtraOptions from "./ExtraOptions/ExtraOptions";
 import { LengthOption } from "./ExtraOptions/LengthSelect";
 
-interface FormDataType {
-  label: number | string;
-  releasedOnly: string;
-  englishOnly: string;
-  username: string;
-  lengths: readonly LengthOption[];
-}
+// interface FormDataType {
+//   label: number | string;
+//   releasedOnly: string;
+//   englishOnly: string;
+//   username: string;
+//   lengths: readonly LengthOption[];
+// }
 
 export const Landing = () => {
   const { register, handleSubmit, watch, setValue } = useForm<FieldValues>();
