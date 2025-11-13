@@ -15,14 +15,25 @@ export const VNHistory: React.FC<VNHistoryProps> = ({ vns }) => {
         onClick={() => setShowHistory(!showHistory)}
         className="p-1 cursor-pointer text-blue-600 hover:text-blue-800"
       >
-        <p className="flex items-center">
+        <p className="flex items-center select-none">
           <span className="text-xl">{showHistory === false ? <IoMdArrowDropdown /> : <IoMdArrowDropup />}</span>
           {showHistory === false ? "Show" : "Hide"} History
           <span className="text-xl">{showHistory === false ? <IoMdArrowDropdown /> : <IoMdArrowDropup />}</span>{" "}
         </p>
       </div>
 
-      {showHistory && <div className="flex flex-col">{vns && vns.map((vn: vnType, counter: number) => <a className="hover:text-blue-600" href={`https://vndb.org/${vn.id}`} key={vn.id}>{`${counter + 1}. ${vn.vn.title}`}</a>)}</div>}
+      {showHistory &&
+        <div className="flex flex-col">
+          {vns
+          && vns.map((vn: vnType, counter: number) =>
+            <span key={counter}>
+              {`${counter + 1}. `}
+              <a href={`https://vndb.org/${vn.id}`} className="cursor-pointer hover:text-blue-800 hover:underline">
+                {`${vn.vn.title}`}
+              </a>
+            </span>)
+          }
+        </div>}
     </div>
   );
 };

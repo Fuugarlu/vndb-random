@@ -14,11 +14,13 @@ ___
 **Changelog:**
 - 2024/11/03: Added filters for release/English. Added info page. Added message for VNs generated multiple times in a row.
 - 2024/11/12: Added a "Show History" button. It gets cleared when you change any settings.
+- 2025/11/13: Included a vn length option. Also added vn links to history and made vns without covers look a bit nicer.
 
 ___
 
 **Known issues:**
 - Currently none. I guess non-descriptive error messages and some "any" types.
+- Code could be cleaner haha...
 
 ___
 

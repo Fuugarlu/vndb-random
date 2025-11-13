@@ -1,30 +1,50 @@
 "use client";
 import React, { useEffect, useState } from "react";
-import { labelType, listLabelsType, userType, vnListType, vnType } from "../types";
+import {
+  labelType,
+  listLabelsType,
+  userType,
+  vnListType,
+  vnType,
+} from "../types";
 import UsernameInput from "./UsernameInput";
 import LabelDropdown from "./LabelDropdown";
-import { useForm } from "react-hook-form";
+import { FieldValues, useForm } from "react-hook-form";
 import SubmitButton from "./Button";
 import VNArea from "./VNArea";
 import Link from "next/link";
 import { VNHistory } from "./VNHistory";
+import ExtraOptions from "./ExtraOptions/ExtraOptions";
+import { LengthOption } from "./ExtraOptions/LengthSelect";
+
+interface FormDataType {
+  label: number | string;
+  releasedOnly: string;
+  englishOnly: string;
+  username: string;
+  lengths: readonly LengthOption[];
+}
 
 export const Landing = () => {
-  const {
-    register,
-    handleSubmit,
-    watch,
-    setValue,
-  } = useForm<any>();
+  const { register, handleSubmit, watch, setValue } = useForm<FieldValues>();
 
   // API-related data
   const [user, setUser] = useState<userType>(null);
   const [listLabels, setListLabels] = useState<listLabelsType>(null);
   const [list, setList] = useState<vnListType>(null);
-  const [generatedVNs, setGeneratedVNs] = useState<any>([]);
+  const [generatedVNs, setGeneratedVNs] = useState<vnListType>([]);
 
   // Forms
-  const [formData, setFormData] = useState<any>("");
+  const [lengthValues, setLengthValues] = useState<readonly LengthOption[]>([]);
+  const [formData, setFormData] = useState<FieldValues>({
+    label: -1,
+    releasedOnly: "",
+    englishOnly: "",
+    username: "",
+    lengths: lengthValues
+  });
+
+  const [oldLengthValues, setOldLengthValues] = useState<readonly LengthOption[]>([]);
   const [oldUser, setOldUser] = useState<userType>(null);
 
   // Misc
@@ -32,7 +52,6 @@ export const Landing = () => {
   const labelValue = watch("label");
   const [sameRandomNumberCount, setSameRandomNumberCount] = useState<number>(0);
 
-  
   useEffect(() => {
     if (list && Array.isArray(list) && list[randomNumber] !== undefined) {
       setGeneratedVNs((generatedVNs: any) => [
@@ -40,7 +59,7 @@ export const Landing = () => {
         list[randomNumber] as vnType,
       ]);
     }
-  }, [list, randomNumber, sameRandomNumberCount])
+  }, [list, randomNumber, sameRandomNumberCount]);
 
   // Loading
   const [loading, setLoading] = useState<boolean>(false);
@@ -48,7 +67,9 @@ export const Landing = () => {
 
   useEffect(() => {
     if (listLabels && listLabels.length > 0) {
-      const containsWishlist = listLabels.find((option: labelType) => option.label === "Wishlist");
+      const containsWishlist = listLabels.find(
+        (option: labelType) => option.label === "Wishlist"
+      );
       if (containsWishlist) setValue("label", containsWishlist.id);
     }
   }, [listLabels, setValue]);
@@ -63,8 +84,10 @@ export const Landing = () => {
     let currentUser: userType = null;
 
     try {
-      // TODO update and remove usernameInput
-      const response = await fetch("https://api.vndb.org/kana/user?q=" + username);
+      // TODO: update and remove usernameInput
+      const response = await fetch(
+        `https://api.vndb.org/kana/user?q=${username}`
+      );
       if (!response.ok) {
         console.log("Network response not ok");
         throw new Error("Network response was not ok");
@@ -87,9 +110,12 @@ export const Landing = () => {
 
     let listLabelsCurrent: listLabelsType = null;
     try {
-      const response = await fetch("https://api.vndb.org/kana/ulist_labels?user=" + currentUser.id);
+      const response = await fetch(
+        `https://api.vndb.org/kana/ulist_labels?user=${currentUser.id}`
+      );
       if (!response.ok) {
         console.log("Network response not ok");
+        console.log(response);
         throw new Error("Network response was not ok");
       }
       const result = await response.json();
@@ -100,24 +126,21 @@ export const Landing = () => {
     }
 
     if (listLabelsCurrent === null) {
-      setError(`Error, idk how we got here though...`);
+      setError(`Error connecting to VNDB. Please try again later!`);
       console.log("Error, listLabels is null.");
-      return;
     }
 
     setLoading(false);
   };
+
   const fetchList = async (label: any) => {
     setLoading(true);
-    // setError(null);
 
     let allResults: vnType[] = [];
     let hasMoreData = true;
     let currentPage = 1;
 
     if (!user) return;
-
-    //     const condition = isReleasedOnlyChecked ? ["labels", "=", selectedLabel] : ["label", "=", selectedLabel];
 
     try {
       do {
@@ -148,7 +171,9 @@ export const Landing = () => {
       } while (hasMoreData === true);
       setList(allResults);
     } catch (err) {
-      setError(err instanceof Error ? err.message : "An unknown error occurred");
+      setError(
+        err instanceof Error ? err.message : "An unknown error occurred"
+      );
       console.log(err);
     } finally {
       setLoading(false);
@@ -165,46 +190,50 @@ export const Landing = () => {
   const generateFilters = (data: any) => {
     const baseFilter = ["label", "=", data.label];
     const finalFilters = [baseFilter];
-    if (data.releasedOnly && data.englishOnly) {
+
+    const releaseFilters: any[] = [];
+
+    if (data.releasedOnly) {
+      releaseFilters.push(["released", "<=", getTodayDate()]);
+    }
+
+    if (data.englishOnly) {
+      releaseFilters.push(["lang", "=", "en"]);
+    }
+
+    if (releaseFilters.length) {
       finalFilters.push([
         "release",
         "=",
-        [
-          "and",
-          ["released", "<=", getTodayDate()], // Example condition for released
-          ["lang", "=", "en"],
-        ],
-      ]);
-    } else if (data.releasedOnly) {
-      finalFilters.push([
-        "release",
-        "=",
-        [
-          "released",
-          "<=",
-          getTodayDate(), // Example condition for released
-        ],
-      ]);
-    } else if (data.englishOnly) {
-      finalFilters.push([
-        "release",
-        "=",
-        [
-          "lang",
-          "=",
-          "en", // Example condition for released
-        ],
+        releaseFilters.length > 1
+          ? ["and", ...releaseFilters]
+          : releaseFilters[0],
       ]);
     }
+
+    if (lengthValues.length > 0) {
+      const lengths = lengthValues.map((item) => item.value);
+      const lengthList = lengths.map((length) => ["length", "=", length]);
+      const lengthFilters = ["or", ...lengthList];
+      finalFilters.push(lengthFilters);
+    }
+
     return finalFilters;
   };
 
-
   return (
-    <div className="w-2/3 mx-auto text-center content-center bg-blue-200 p-3 rounded-md my-2 flex flex-col gap-2">
+    <div className="w-full md:max-w-3xl lg:max-w-5xl mx-auto text-center content-center bg-blue-200 p-3 rounded-md my-2 flex flex-col gap-2">
       <div>
-      <p>Random VNDB Grabber by <Link href="/info" className="text-blue-600 underline hover:text-blue-800">Fuugarlu</Link></p>
-      <p className="text-sm italic">(Grab a random vn from your vndb list)</p>
+        <p>
+          Random VNDB Grabber by{" "}
+          <Link
+            href="/info"
+            className="text-blue-600 underline hover:text-blue-800"
+          >
+            Fuugarlu
+          </Link>
+        </p>
+        <p className="text-sm italic">(Grab a random vn from your vndb list)</p>
       </div>
 
       <form
@@ -231,15 +260,21 @@ export const Landing = () => {
       <form
         onSubmit={handleSubmit((data) => {
           if (data.label == "") return;
-          if (data.label != formData.label || data.releasedOnly != formData.releasedOnly || data.englishOnly != formData.englishOnly || user != oldUser) {
-            console.log("Fetching");
+          if (
+            data.label != formData.label ||
+            data.releasedOnly != formData.releasedOnly ||
+            data.englishOnly != formData.englishOnly ||
+            lengthValues != oldLengthValues ||
+            user != oldUser
+          ) {
+            // console.log("Fetching");
             setGeneratedVNs([]);
+            setOldLengthValues(lengthValues);
             setOldUser(user);
             setSameRandomNumberCount(0);
             const filters = generateFilters(data);
             fetchList(["and", ...filters]);
           } else if (list) {
-            console.log("Repeat");
             const newRandomNumber = Math.floor(Math.random() * list.length);
             if (newRandomNumber == randomNumber) {
               setSameRandomNumberCount(sameRandomNumberCount + 1);
@@ -281,11 +316,13 @@ export const Landing = () => {
             </label>
           </div>
 
+          <ExtraOptions lengths={lengthValues} setLengths={setLengthValues} />
+
           <SubmitButton
             disabled={!(user && labelValue !== "") || loading}
             fullWidth={true}
             customClasses={`${user && labelValue !== "" ? "bg-green-200" : ""}`}
-            label={user ? "Generate!" : "Select user & label"}
+            label={user ? "Generate!" : "Select user & label first"}
           />
         </div>
       </form>
@@ -304,9 +341,7 @@ export const Landing = () => {
         />
       )}
 
-      {list && (
-        <VNHistory vns={generatedVNs}/>
-      )}
+      {list && <VNHistory vns={generatedVNs} />}
     </div>
   );
 };
