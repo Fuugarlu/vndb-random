@@ -23,7 +23,7 @@ const VNDisplay = ({ vnInfo, sameRandomNumberCount }: VNDisplayProps) => {
       <a href={`https://vndb.org/${vnId}`}>
         {vn.image && (
           <img
-            className="max-w-lg max-h-96"
+            className="max-w-lg max-h-96 max-w-full"
             src={vn.image.url}
             alt={vn.title}
           />

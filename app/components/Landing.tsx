@@ -222,7 +222,7 @@ export const Landing = () => {
   };
 
   return (
-    <div className="w-2/3 mx-auto text-center content-center bg-blue-200 p-3 rounded-md my-2 flex flex-col gap-2">
+    <div className="w-full md:max-w-3xl lg:max-w-5xl mx-auto text-center content-center bg-blue-200 p-3 rounded-md my-2 flex flex-col gap-2">
       <div>
         <p>
           Random VNDB Grabber by{" "}
